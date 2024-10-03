@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"target": "ESNext",
 		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
 		"baseUrl": "src",
@@ -7,9 +8,7 @@
 		"declarationMap": false,
 		"esModuleInterop": true,
 		"inlineSourceMap": false,
-		// es2020 is what Node.JS v14 supports
-		// see https://github.com/tsconfig/bases/blob/main/bases/node14.json
-		"lib": ["es2020", "dom"],
+		"lib": ["esnext", "dom"],
 		"listEmittedFiles": false,
 		"moduleResolution": "node",
 		"noUnusedLocals": true,

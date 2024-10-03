@@ -81,15 +81,6 @@ viteSingleFile({ useRecommendedBuildConfig: false })
 Refer to the `_useRecommendedBuildConfig` function in the `index.ts` file of this repository to see the
 recommended configuration.
 
-### removeViteModuleLoader
-
-Defaults to `false`. Vite includes a function in your build to load other bundles. Since we're inlining
-all bundles, you can use this option to have the bundle-loading function removed from your final build:
-
-```ts
-viteSingleFile({ removeViteModuleLoader: true })
-```
-
 ### inlinePattern
 
 Defaults to `[]`, which will inline all recognized JavaScript and CSS assets. You can provide a string
@@ -105,16 +96,14 @@ Defaults to `true`, which deletes all inlined files that were inlined. A use cas
 - Static resources in `public` folder (like `favicon`) are not inlined by Vite, and this plugin doesn't do that either. BUT the output single HTML file CAN work together with these resouces, using relative paths.
 - Inlining of SVG isn't supported directly by Vite, so it isn't supported directly here either. You'll need to use something like `https://github.com/jpkleemans/vite-svg-loader`, or put your SVG directly into the template.
 - There may be other situations where referenced files aren't inlined by Vite and aren't caught by this plugin either.
-- This is my first Vite and first Rollup plugin. I have no idea what I'm doing. PRs welcome.
-- This plugin uses dual packages to support both ESM and CommonJS users. This _should_ work automatically. Details:
   - <https://nodejs.org/api/packages.html#packages_dual_package_hazard>
   - <https://www.sensedeep.com/blog/posts/2021/how-to-create-single-source-npm-module.html>
 
 ## Contributing
 
-- Please have PrettierJS installed so your IDE formatting doesn't overwrite the formatting in the source files
+<!-- - Please have PrettierJS installed so your IDE formatting doesn't overwrite the formatting in the source files
 - Please clone [vite-plugin-singlefile-example](https://github.com/richardtallent/vite-plugin-singlefile-example) in a sister folder and use it to test your modifications to this plugin before submitting a PR. (I'm happy to take PRs for it as well if you want to add more edge cases to test, such as a large third-party dependency. It's pretty barebones for now.)
-- I wasn't able to persuade Jest to run on the bare source file, so it instead compiles and runs the CommonJS distribution file.
+- I wasn't able to persuade Jest to run on the bare source file, so it instead compiles and runs the CommonJS distribution file. -->
 
 ## License
 

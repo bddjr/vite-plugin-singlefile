@@ -8,10 +8,6 @@ export type Config = {
 	//
 	// @default true
 	useRecommendedBuildConfig?: boolean
-	// Remove the unused Vite module loader. Safe to do since all JS is inlined by this plugin.
-	//
-	// @default false
-	removeViteModuleLoader?: boolean
 	// Optionally, only inline assets that match one or more glob patterns.
 	//
 	// @default []
@@ -22,21 +18,25 @@ export type Config = {
 	deleteInlinedFiles?: boolean
 }
 
-const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false, deleteInlinedFiles: true }
+const defaultConfig = { useRecommendedBuildConfig: true, deleteInlinedFiles: true }
 
-export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
-	const reScript = new RegExp(`<script([^>]*?) src="[./]*${scriptFilename}"([^>]*)></script>`)
-	const preloadMarker = /"?__VITE_PRELOAD__"?/g
-	const newCode = scriptCode.replace(preloadMarker, "void 0")
-	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${newCode}</script>`)
-	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
+export function replaceScript(html: string, scriptFilename: string, scriptCode: string): string {
+	// Prevent accidental closure
+	scriptCode = scriptCode.replaceAll('</script>', '\\x3c/script>')
+	return html.replace(
+		// Vite always uses this format to build script tags
+		`<script type="module" crossorigin src="${scriptFilename}"></script>`,
+		`<script type="module">${scriptCode}</script>`
+	)
 }
 
 export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
-	const reStyle = new RegExp(`<link([^>]*?) href="[./]*${scriptFilename}"([^>]*?)>`)
-	const legacyCharSetDeclaration = /@charset "UTF-8";/
-	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${scriptCode.replace(legacyCharSetDeclaration, "")}</style>`);
-	return inlined
+	scriptCode = scriptCode.replace(/^@charset "UTF-8";/, '')
+	return html.replace(
+		// Vite always uses this format to build link tags
+		`<link rel="stylesheet" crossorigin href="${scriptFilename}">`,
+		`<style>${scriptCode}</style>`
+	)
 }
 
 const isJsFile = /\.[mc]?js$/
@@ -45,7 +45,6 @@ const isHtmlFile = /\.html?$/
 
 export function viteSingleFile({
 	useRecommendedBuildConfig = true,
-	removeViteModuleLoader = false,
 	inlinePattern = [],
 	deleteInlinedFiles = true,
 }: Config = defaultConfig): PluginOption {
@@ -90,7 +89,7 @@ export function viteSingleFile({
 					if (jsChunk.code != null) {
 						console.debug(`Inlining: ${filename}`)
 						bundlesToDelete.push(filename)
-						replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
+						replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code)
 					}
 				}
 				for (const filename of files.css) {
@@ -102,6 +101,10 @@ export function viteSingleFile({
 					console.debug(`Inlining: ${filename}`)
 					bundlesToDelete.push(filename)
 					replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string)
+					if (replacedHtml == htmlChunk.source) {
+						warnNotInlined(filename)
+						continue
+					}
 				}
 				htmlChunk.source = replacedHtml
 			}
@@ -117,23 +120,13 @@ export function viteSingleFile({
 	}
 }
 
-// Optionally remove the Vite module loader since it's no longer needed because this plugin has inlined all code.
-// This assumes that the Module Loader is (1) the FIRST function declared in the module, (2) an IIFE, (4) is within
-// a script with no unexpected attribute values, and (5) that the containing script is the first script tag that
-// matches the above criteria. Changes to the SCRIPT tag especially could break this again in the future. It should
-// work whether `minify` is enabled or not.
-// Update example:
-// https://github.com/richardtallent/vite-plugin-singlefile/issues/57#issuecomment-1263950209
-const _removeViteModuleLoader = (html: string) =>
-	html.replace(/(<script type="module" crossorigin>\s*)\(function(?: polyfill)?\(\)\s*\{[\s\S]*?\}\)\(\);/, '<script type="module">')
-
 // Modifies the Vite build config to make this plugin work well.
 const _useRecommendedBuildConfig = (config: UserConfig) => {
 	if (!config.build) config.build = {}
 	// Ensures that even very large assets are inlined in your JavaScript.
 	config.build.assetsInlineLimit = () => true
 	// Avoid warnings about large chunks.
-	config.build.chunkSizeWarningLimit = 100000000
+	config.build.chunkSizeWarningLimit = Infinity
 	// Emit all CSS as a single file, which `vite-plugin-singlefile` can then inline.
 	config.build.cssCodeSplit = false
 	// We need relative path to support any static files in public folder,
@@ -142,6 +135,8 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 	// Make generated files in ${build.outDir}'s root, instead of default ${build.outDir}/assets.
 	// Then the embedded resources can be loaded by relative path.
 	config.build.assetsDir = ''
+	// https://github.com/richardtallent/vite-plugin-singlefile/issues/57#issuecomment-2390579177
+	config.build.modulePreload = { polyfill: false }
 
 	if (!config.build.rollupOptions) config.build.rollupOptions = {}
 	if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
@@ -149,6 +144,9 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 	const updateOutputOptions = (out: OutputOptions) => {
 		// Ensure that as many resources as possible are inlined.
 		out.inlineDynamicImports = true
+		out.assetFileNames =
+			out.entryFileNames =
+			out.chunkFileNames = undefined
 	}
 
 	if (Array.isArray(config.build.rollupOptions.output)) {
