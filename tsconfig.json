@@ -1,9 +1,23 @@
 {
-	"extends": "./tsconfig-base.json",
 	"compilerOptions": {
 		"module": "esnext",
 		"target": "esnext",
-		"declarationDir": "dist/",
+		"lib": [
+			"ESNext",
+			"DOM"
+		],
 		"outDir": "dist/",
-	}
+		"allowSyntheticDefaultImports": true,
+		"moduleResolution": "node",
+		"skipLibCheck": true,
+		"declaration": true,
+		"declarationMap": false,
+	},
+	"include": [
+		"./src"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
 }
