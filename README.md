@@ -1,6 +1,6 @@
 # vite-plugin-singlefile
 
-Original: [ricardhtallent/vite-plugin-singlefile](https://github.com/ricardhtallent/vite-plugin-singlefile)
+Original: https://github.com/richardtallent/vite-plugin-singlefile
 
 This Vite build plugin allows you to _inline_ all JavaScript and CSS resources directly into the final `dist/index.html` file. By doing this, your _entire web app_ can be embedded and distributed as a single HTML file.
 
