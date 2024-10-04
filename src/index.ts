@@ -20,22 +20,21 @@ export type Config = {
 
 const defaultConfig = { useRecommendedBuildConfig: true, deleteInlinedFiles: true }
 
-export function replaceScript(html: string, scriptFilename: string, scriptCode: string): string {
+export function replaceScript(html: string, path: string, code: string): string {
 	// Prevent accidental closure
-	scriptCode = scriptCode.replaceAll('</script>', '\\x3c/script>')
+	code = code.replaceAll('</script>', '\\x3c/script>')
 	return html.replace(
 		// Vite always uses this format to build script tags
-		`<script type="module" crossorigin src="${scriptFilename}"></script>`,
-		`<script type="module">${scriptCode}</script>`
+		`<script type="module" crossorigin src="${path}"></script>`,
+		`<script type=module>${code}</script>`
 	)
 }
 
-export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
-	scriptCode = scriptCode.replace(/^@charset "UTF-8";/, '')
+export function replaceCss(html: string, path: string, code: string): string {
 	return html.replace(
 		// Vite always uses this format to build link tags
-		`<link rel="stylesheet" crossorigin href="${scriptFilename}">`,
-		`<style>${scriptCode}</style>`
+		`<link rel="stylesheet" crossorigin href="${path}">`,
+		`<style>${code}</style>`
 	)
 }
 
@@ -124,7 +123,7 @@ export function viteSingleFile({
 const _useRecommendedBuildConfig = (config: UserConfig) => {
 	if (!config.build) config.build = {}
 	// Ensures that even very large assets are inlined in your JavaScript.
-	config.build.assetsInlineLimit = () => true
+	config.build.assetsInlineLimit = Infinity
 	// Avoid warnings about large chunks.
 	config.build.chunkSizeWarningLimit = Infinity
 	// Emit all CSS as a single file, which `vite-plugin-singlefile` can then inline.
@@ -141,12 +140,9 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 	if (!config.build.rollupOptions) config.build.rollupOptions = {}
 	if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
 
-	const updateOutputOptions = (out: OutputOptions) => {
+	function updateOutputOptions(out: OutputOptions) {
 		// Ensure that as many resources as possible are inlined.
 		out.inlineDynamicImports = true
-		out.assetFileNames =
-			out.entryFileNames =
-			out.chunkFileNames = undefined
 	}
 
 	if (Array.isArray(config.build.rollupOptions.output)) {
