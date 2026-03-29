@@ -1,6 +1,6 @@
 {
   "name": "@bddjr/vite-plugin-singlefile",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "author": "bddjr",
   "license": "MIT",
   "description": "Embed all assets into dist/index.html",
@@ -44,7 +44,6 @@
     "vite-plugin-singlefile"
   ],
   "dependencies": {
-    "@types/node": "*",
     "jsdom": ">=28.1.0",
     "mime": ">=4.1.0",
     "mini-svg-data-uri": ">=1.4.4",
