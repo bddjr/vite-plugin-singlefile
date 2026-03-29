@@ -150,26 +150,23 @@ async function generateBundle(this: PluginContext, bundle: OutputBundle, config:
         }
 
         // inline html assets
-        const assetsDataURL = {} as { [key: string]: string }
         if (options.tryInlineHtmlAssets) {
             for (const element of document.querySelectorAll<HTMLImageElement>(assetsSrcSelector)) {
                 const name = cutPrefix(element.src, assetsDirWithBase)
                 if (/\.js$/i.test(name))
                     continue
-                if (!Object.prototype.hasOwnProperty.call(assetsDataURL, name)) {
-                    const bundleName = assetsDir + name
-                    const a = bundle[bundleName] as OutputAsset
-                    if (!a)
-                        continue
-                    thisDel.add(bundleName)
-                    let dataURL: string
-                    if (Object.prototype.hasOwnProperty.call(globalAssetsDataURL, name)) {
-                        dataURL = globalAssetsDataURL[name]
-                    } else {
-                        globalAssetsDataURL[name] = dataURL = bufferToDataURL(name, Buffer.from(a.source))
-                    }
-                    element.src = dataURL
+                const bundleName = assetsDir + name
+                const a = bundle[bundleName] as OutputAsset
+                if (!a)
+                    continue
+                thisDel.add(bundleName)
+                let dataURL: string
+                if (Object.prototype.hasOwnProperty.call(globalAssetsDataURL, name)) {
+                    dataURL = globalAssetsDataURL[name]
+                } else {
+                    globalAssetsDataURL[name] = dataURL = bufferToDataURL(name, Buffer.from(a.source))
                 }
+                element.src = dataURL
             }
         }
 
@@ -178,7 +175,7 @@ async function generateBundle(this: PluginContext, bundle: OutputBundle, config:
             let needInline = true
             let iconName = 'favicon.ico'
             // replace tag
-            const element = document.querySelector(`link[rel=icon][href^="${config.base}"], link[rel="shortcut icon"][href^="${config.base}"]`) as HTMLLinkElement
+            const element = document.querySelector<HTMLLinkElement>(`link[rel=icon][href^="${config.base}"], link[rel="shortcut icon"][href^="${config.base}"]`)
             if (element) {
                 iconName = cutPrefix(element.href, config.base)
                 if (bundleAssetsNames.includes(iconName)) {
@@ -230,7 +227,6 @@ async function generateBundle(this: PluginContext, bundle: OutputBundle, config:
             const assetName = name.slice(assetsDir.length)
             if (code.includes(assetName)) {
                 globalDoNotDelete.add(name)
-                delete assetsDataURL[assetName]
             }
         }
 
