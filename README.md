@@ -1,0 +1,109 @@
+# vite plugin singlefile compression
+
+Embed all assets into `dist/index.html`
+
+Preview: https://bddjr.github.io/vite-plugin-singlefile/
+
+> [!TIP]  
+> You may need: [vite-plugin-singlefile-compression](https://github.com/bddjr/vite-plugin-singlefile-compression)  
+
+## Setup
+
+```
+npm i @bddjr/vite-plugin-singlefile@latest -D
+```
+
+Then modify `vite.config.ts`, like [test/vite.config.ts](test/vite.config.ts)
+
+```diff
++ import singleFile from '@bddjr/vite-plugin-singlefile'
+
+  export default defineConfig({
+    plugins: [
+      vue(),
+      vueDevTools(),
++     singleFile(),
+    ],
+```
+
+Then use hash history, like [test/src/router/index.ts](test/src/router/index.ts)
+
+```diff
+  const router = createRouter({
+-   history: createWebHistory(),
++   history: createWebHashHistory(),
+```
+
+## Options
+
+Example:
+
+```ts
+singleFileCompression({
+  rename: 'example.html'
+}),
+```
+
+### rename
+
+Rename index.html
+
+type: `string`
+
+### tryInlineHtmlAssets
+
+Try inline html used assets, if inlined or not used in JS.
+
+default: `true`
+
+type: `boolean`
+
+### removeInlinedAssetFiles
+
+Remove inlined asset files.
+
+default: `true`
+
+type: `boolean`
+
+### tryInlineHtmlPublicIcon
+
+Try inline html icon, if icon is in public dir.
+
+default: `true`
+
+type: `boolean`
+
+### removeInlinedPublicIconFiles
+
+Remove inlined html icon files.
+
+default: `true`
+
+type: `boolean`
+
+
+## Effect
+
+Preview: https://bddjr.github.io/vite-plugin-singlefile/
+
+```
+vite v8.0.3 building client environment for production...
+✓ 43 modules transformed.
+computing gzip size...
+dist/index.html  123.51 kB │ gzip: 43.22 kB
+
+✓ built in 379ms
+```
+
+## Clone
+
+```
+git clone https://github.com/bddjr/vite-plugin-singlefile
+cd vite-plugin-singlefile
+npm i
+cd test
+npm i
+cd ..
+npm run build
+```

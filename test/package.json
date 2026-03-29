@@ -1,0 +1,52 @@
+{
+  "name": "test",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "node build-md.mjs && run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build",
+    "format": "oxfmt src/"
+  },
+  "dependencies": {
+    "vue": "beta",
+    "vue-router": "^5.0.3"
+  },
+  "devDependencies": {
+    "@bddjr/vite-plugin-singlefile": "file:..",
+    "@tsconfig/node24": "^24.0.4",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^24.12.0",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "@vue/tsconfig": "^0.9.0",
+    "markdown-it": "^14.1.1",
+    "markdown-it-highlightjs": "^4.3.0",
+    "npm-run-all2": "^8.0.4",
+    "oxfmt": "^0.37.0",
+    "typescript": "~5.9.3",
+    "vite": "file:../node_modules/vite",
+    "vite-plugin-vue-devtools": "^8.0.7",
+    "vue-tsc": "^3.2.5"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "overrides": {
+    "vue": "beta",
+    "@vue/compiler-core": "beta",
+    "@vue/compiler-dom": "beta",
+    "@vue/compiler-sfc": "beta",
+    "@vue/compiler-ssr": "beta",
+    "@vue/compiler-vapor": "beta",
+    "@vue/reactivity": "beta",
+    "@vue/runtime-core": "beta",
+    "@vue/runtime-dom": "beta",
+    "@vue/runtime-vapor": "beta",
+    "@vue/server-renderer": "beta",
+    "@vue/shared": "beta",
+    "@vue/compat": "beta"
+  }
+}
