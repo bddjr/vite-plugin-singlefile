@@ -1,4 +1,4 @@
-# vite plugin singlefile compression
+# vite plugin singlefile
 
 Embed all assets into `dist/index.html`
 

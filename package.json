@@ -1,6 +1,6 @@
 {
   "name": "@bddjr/vite-plugin-singlefile",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": "bddjr",
   "license": "MIT",
   "description": "Embed all assets into dist/index.html",
