@@ -13,6 +13,7 @@ await rolldownBuild({
     output: {
         format: 'esm',
         dir: 'dist',
+        cleanDir: true,
     },
     external(id) {
         return !id.startsWith('.') && !path.isAbsolute(id);
