@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2021",
-    "module": "node20",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "rootDir": "src",
     "outDir": "dist",
     "allowSyntheticDefaultImports": true,

@@ -1,7 +1,7 @@
 # Setup
 
 ```
-npm i @bddjr/vite-plugin-singlefile@latest -D
+npm i -D @bddjr/vite-plugin-singlefile@latest
 ```
 
 Then modify `vite.config.ts`, like [test/vite.config.ts](test/vite.config.ts)
