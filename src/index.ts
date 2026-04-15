@@ -5,7 +5,7 @@ import { JSDOM } from 'jsdom'
 import path from 'path'
 import fs from 'fs'
 
-import type { RollupOptions } from './types/RollupOptions.d.ts'
+import type { RollupOptions } from "@bddjr/types-rollupoptions-4.43.0"
 import { bufferToDataURL } from "./dataurl.js"
 import { getInnerOptions, type Options, InnerOptions as InnerOptions } from "./options.js"
 import { cutPrefix } from "./cutPrefix.js"
