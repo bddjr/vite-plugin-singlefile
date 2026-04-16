@@ -170,51 +170,68 @@ async function generateBundle(this: PluginContext, bundle: OutputBundle, config:
             }
         }
 
-        // inline html icon
-        if (options.tryInlineHtmlPublicIcon) {
-            let needInline = true
-            let iconName = 'favicon.ico'
-            // replace tag
-            const element = document.querySelector<HTMLLinkElement>(`link[rel=icon][href^="${config.base}"], link[rel="shortcut icon"][href^="${config.base}"]`)
-            if (element) {
-                iconName = cutPrefix(element.href, config.base)
-                if (bundleAssetsNames.includes(iconName)) {
-                    needInline = false
+        // inline html favicon
+        let linkFavicon = document.querySelector<HTMLLinkElement>(`link[rel=icon][href^="${config.base}"]`)
+        {
+            const link_shortcut_icon = document.querySelector<HTMLLinkElement>(`link[rel="shortcut icon"][href^="${config.base}"]`)
+            if (link_shortcut_icon) {
+                if (linkFavicon) {
+                    link_shortcut_icon.remove()
                 } else {
-                    element.rel = 'icon'
-                    element.href = 'data:'
+                    link_shortcut_icon.rel = 'icon'
+                    linkFavicon = link_shortcut_icon
                 }
             }
-            if (needInline) {
-                // inline
-                try {
-                    if (!Object.prototype.hasOwnProperty.call(globalPublicFilesCache, iconName)) {
-                        // dist/favicon.ico
-                        let Path = path.join(config.build.outDir, iconName)
-                        if (fs.existsSync(Path)) {
-                            globalRemoveDistFileNames.add(iconName)
-                        } else {
-                            // public/favicon.ico
-                            Path = path.join(config.publicDir, iconName)
-                        }
-                        // read
-                        const b = fs.readFileSync(Path)
-                        globalPublicFilesCache[iconName] = {
-                            dataURL: bufferToDataURL(iconName, b),
-                            size: b.length
-                        }
-                    }
-                    const { dataURL, size } = globalPublicFilesCache[iconName]
-                    if (element) {
-                        element.href = dataURL
+        }
+        let faviconName = 'favicon.ico'
+        let faviconIsDataURL = false
+        if (linkFavicon) {
+            faviconName = linkFavicon.href
+            faviconIsDataURL = /^data:/i.test(faviconName)
+            if (!faviconIsDataURL)
+                faviconName = cutPrefix(faviconName, config.base)
+        }
+
+        function setFaviconDataURL(dataURL: string) {
+            if (linkFavicon) {
+                linkFavicon.href = dataURL
+            } else {
+                const e = document.head.appendChild(document.createElement('link'))
+                e.rel = 'icon'
+                e.href = dataURL
+            }
+        }
+
+        if (faviconIsDataURL) {
+            //
+        } else if (bundleAssetsNames.includes(faviconName)) {
+            const asset = bundle[faviconName] as OutputAsset
+            if (asset) {
+                setFaviconDataURL(bufferToDataURL(faviconName, Buffer.from(asset.source)))
+                thisDel.add(faviconName)
+            }
+        } else if (options.tryInlineHtmlPublicIcon) {
+            try {
+                if (!Object.prototype.hasOwnProperty.call(globalPublicFilesCache, faviconName)) {
+                    // dist/favicon.ico
+                    let Path = path.join(config.build.outDir, faviconName)
+                    if (fs.existsSync(Path)) {
+                        globalRemoveDistFileNames.add(faviconName)
                     } else {
-                        const e = document.head.appendChild(document.createElement('link'))
-                        e.rel = 'icon'
-                        e.href = dataURL
+                        // public/favicon.ico
+                        Path = path.join(config.publicDir, faviconName)
                     }
-                } catch (e) {
-                    if (element) console.error(e)
+                    // read
+                    const b = fs.readFileSync(Path)
+                    globalPublicFilesCache[faviconName] = {
+                        dataURL: bufferToDataURL(faviconName, b),
+                        size: b.length
+                    }
                 }
+                const { dataURL, size } = globalPublicFilesCache[faviconName]
+                setFaviconDataURL(dataURL)
+            } catch (e) {
+                if (linkFavicon) console.error(e)
             }
         }
 
