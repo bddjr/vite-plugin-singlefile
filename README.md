@@ -2,7 +2,7 @@
 
 Embed all assets into `dist/index.html`
 
-Preview: https://bddjr.github.io/vite-plugin-singlefile/
+Preview: https://bddjr.github.io/vite-plugin-singlefile/#/
 
 > [!TIP]  
 > You may need: [vite-plugin-singlefile-compression](https://github.com/bddjr/vite-plugin-singlefile-compression)  
@@ -85,7 +85,7 @@ type: `boolean`
 
 ## Effect
 
-Preview: https://bddjr.github.io/vite-plugin-singlefile/
+Preview: https://bddjr.github.io/vite-plugin-singlefile/#/
 
 ```
 vite v8.0.8 building client environment for production...
