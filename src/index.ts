@@ -137,7 +137,7 @@ async function generateBundle(this: PluginContext, bundle: OutputBundle, config:
                         globalDoNotDelete.add(name)
                 }
                 // add script for load css
-                allCSS += cssSource.replace(/\s*(\/\*[^*]*\*\/)?\s*$/, '')
+                allCSS += cssSource.replace(/(\s*\/\*([^*]|\*(?!\/))*\*\/)*\s*$/, '')
             }
         }
         if (allCSS) {
@@ -252,14 +252,17 @@ async function generateBundle(this: PluginContext, bundle: OutputBundle, config:
             }
         }
 
-        let outputScript = code.replaceAll('</script', '<\\/script')
-
         // 此 polyfill 仅在以下选项的值为 false 时需要。
         // config.build.rolldownOptions.output.codeSplitting
-        if (/\b__VITE_PRELOAD__\b/.test(code))
-            outputScript = "var __VITE_PRELOAD__;" + outputScript
+        if (/\b__VITE_PRELOAD__\b/.test(code)) {
+            if (code.startsWith('var ')) {
+                code = 'var __VITE_PRELOAD__,' + code.slice(4)
+            } else {
+                code = "var __VITE_PRELOAD__;" + code
+            }
+        }
 
-        scriptElement.innerHTML = outputScript
+        scriptElement.innerHTML = code.replaceAll('</script', '<\\/script')
 
         // generate html
         htmlChunk.source = dom.serialize()
