@@ -91,9 +91,9 @@ Preview: https://bddjr.github.io/vite-plugin-singlefile/#/
 vite v8.0.10 building client environment for production...
 ✓ 43 modules transformed.
 computing gzip size...
-dist/index.html  123.86 kB │ gzip: 43.32 kB
+dist/index.html  123.89 kB │ gzip: 43.34 kB
 
-✓ built in 347ms
+✓ built in 333ms
 ```
 
 ## Clone
