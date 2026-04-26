@@ -70,32 +70,32 @@ async function generateBundle(this: PluginContext, bundle: OutputBundle, config:
         delete bundle["index.html"]
     }
 
-    const
-        /** "assets/" */
-        assetsDir = path.posix.join(config.build.assetsDir, '/'),
+    /** "assets/" */
+    const assetsDir = path.posix.join(config.build.assetsDir, '/')
         /** "./assets/" */
-        assetsDirWithBase = config.base + assetsDir,
+        , assetsDirWithBase = config.base + assetsDir
         /** '[href^="./assets/"]' */
-        assetsHrefSelector = `[href^="${assetsDirWithBase}"]`,
+        , assetsHrefSelector = `[href^="${assetsDirWithBase}"]`
         /** '[src^="./assets/"]' */
-        assetsSrcSelector = `[src^="${assetsDirWithBase}"]`,
+        , assetsSrcSelector = `[src^="${assetsDirWithBase}"]`
 
-        globalDelete = new Set<string>(),
-        globalDoNotDelete = new Set<string>(),
-        globalRemoveDistFileNames = new Set<string>(),
+        , globalDelete = new Set<string>()
+        , globalDoNotDelete = new Set<string>()
+        , globalRemoveDistFileNames = new Set<string>()
 
-        globalAssetsDataURL = {} as { [key: string]: string },
-        globalPublicFilesCache = {} as {
+        , globalAssetsDataURL = {} as { [key: string]: string }
+        , globalPublicFilesCache = {} as {
             [key: string]: {
+                buffer: Buffer,
                 dataURL: string,
                 size: number,
             }
-        },
+        }
 
         /** format: ["assets/index-XXXXXXXX.js"] */
-        bundleAssetsNames = [] as string[],
+        , bundleAssetsNames = [] as string[]
         /** format: ["index.html"] */
-        bundleHTMLNames = [] as string[]
+        , bundleHTMLNames = [] as string[]
 
     for (const name in bundle) {
         if (name.startsWith(assetsDir))
@@ -106,11 +106,11 @@ async function generateBundle(this: PluginContext, bundle: OutputBundle, config:
 
     for (const htmlFileName of bundleHTMLNames) {
         // init
-        const htmlChunk = bundle[htmlFileName] as OutputAsset,
-            oldHTML = htmlChunk.source as string,
-            dom = new JSDOM(oldHTML),
-            document = dom.window.document,
-            scriptElement = document.querySelector<HTMLScriptElement>(`script[type=module]${assetsSrcSelector}`)
+        const htmlChunk = bundle[htmlFileName] as OutputAsset
+            , oldHTML = htmlChunk.source as string
+            , dom = new JSDOM(oldHTML)
+            , document = dom.window.document
+            , scriptElement = document.querySelector<HTMLScriptElement>(`script[type=module]${assetsSrcSelector}`)
 
         if (!scriptElement) continue;
 
@@ -171,74 +171,79 @@ async function generateBundle(this: PluginContext, bundle: OutputBundle, config:
         }
 
         // inline html favicon
-        let linkFavicon = document.querySelector<HTMLLinkElement>(`link[rel=icon][href^="${config.base}"]`)
-        {
-            const link_shortcut_icon = document.querySelector<HTMLLinkElement>(`link[rel="shortcut icon"][href^="${config.base}"]`)
-            if (link_shortcut_icon) {
-                if (linkFavicon) {
-                    link_shortcut_icon.remove()
+        const createIconElement = (href?: string | null) => {
+            const e = document.createElement('link')
+            e.rel = 'icon'
+            if (href != null) e.href = href
+            return e
+        }
+
+        const getPublicIcon = (faviconName: string) => {
+            if (!Object.prototype.hasOwnProperty.call(globalPublicFilesCache, faviconName)) {
+                // dist/favicon.ico
+                let _path = path.join(config.build.outDir, faviconName)
+                if (fs.existsSync(_path)) {
+                    globalRemoveDistFileNames.add(faviconName)
                 } else {
-                    link_shortcut_icon.rel = 'icon'
-                    linkFavicon = link_shortcut_icon
+                    // public/favicon.ico
+                    _path = path.join(config.publicDir, faviconName)
+                    if (!fs.existsSync(_path)) return null
+                }
+                // read
+                const b = fs.readFileSync(_path)
+                globalPublicFilesCache[faviconName] = {
+                    buffer: b,
+                    dataURL: bufferToDataURL(faviconName, b),
+                    size: b.length
                 }
             }
+            return globalPublicFilesCache[faviconName]
         }
-        let faviconName = 'favicon.ico'
-        let faviconIsDataURL = false
-        if (linkFavicon) {
-            faviconName = linkFavicon.href
-            faviconIsDataURL = /^data:/i.test(faviconName)
+
+        const linkFaviconAll = document.querySelectorAll<HTMLLinkElement>(`link[rel=icon][href]:not([href=""]),link[rel="shortcut icon"][href]:not([href=""])`)
+
+        if (linkFaviconAll.length == 0) {
+            if (options.tryInlineHtmlPublicIcon) {
+                const fileCache = getPublicIcon('favicon.ico')
+                if (fileCache) {
+                    const e = createIconElement(fileCache.dataURL)
+                    document.head.appendChild(e)
+                }
+            }
+        } else for (const linkFavicon of linkFaviconAll) {
+            let faviconName = linkFavicon.href
+            const faviconIsDataURL = /^data:/i.test(faviconName)
             if (!faviconIsDataURL)
                 faviconName = cutPrefix(faviconName, config.base)
-        }
 
-        function setFaviconDataURL(dataURL: string) {
-            if (linkFavicon) {
-                linkFavicon.href = dataURL
-            } else {
-                const e = document.head.appendChild(document.createElement('link'))
-                e.rel = 'icon'
-                e.href = dataURL
-            }
-        }
-
-        if (faviconIsDataURL) {
-            //
-        } else if (bundleAssetsNames.includes(faviconName)) {
-            const asset = bundle[faviconName] as OutputAsset
-            if (asset) {
-                setFaviconDataURL(bufferToDataURL(faviconName, Buffer.from(asset.source)))
-                thisDel.add(faviconName)
-            }
-        } else if (options.tryInlineHtmlPublicIcon) {
-            try {
-                if (!Object.prototype.hasOwnProperty.call(globalPublicFilesCache, faviconName)) {
-                    // dist/favicon.ico
-                    let Path = path.join(config.build.outDir, faviconName)
-                    if (fs.existsSync(Path)) {
-                        globalRemoveDistFileNames.add(faviconName)
-                    } else {
-                        // public/favicon.ico
-                        Path = path.join(config.publicDir, faviconName)
-                    }
-                    // read
-                    const b = fs.readFileSync(Path)
-                    globalPublicFilesCache[faviconName] = {
-                        dataURL: bufferToDataURL(faviconName, b),
-                        size: b.length
-                    }
+            const setFaviconDataURL = (dataURL: string) => {
+                if (linkFavicon) {
+                    linkFavicon.href = dataURL
+                } else {
+                    document.head.appendChild(createIconElement(dataURL))
                 }
-                const { dataURL, size } = globalPublicFilesCache[faviconName]
-                setFaviconDataURL(dataURL)
-            } catch (e) {
-                if (linkFavicon) console.error(e)
+            }
+
+            if (faviconIsDataURL) {
+                //
+            } else if (bundleAssetsNames.includes(faviconName)) {
+                const asset = bundle[faviconName] as OutputAsset
+                if (asset) {
+                    setFaviconDataURL(bufferToDataURL(faviconName, Buffer.from(asset.source)))
+                    thisDel.add(faviconName)
+                }
+            } else if (options.tryInlineHtmlPublicIcon) {
+                const fileCache = getPublicIcon(faviconName)
+                if (fileCache) {
+                    setFaviconDataURL(fileCache.dataURL)
+                }
             }
         }
 
         // fill script
         thisDel.add(scriptName)
         let { code } = bundle[scriptName] as OutputChunk
-        code = code.replace(/;?\n?$/, '')
+        code = code.replace(/;?\s*$/, '')
         // do not delete not inlined asset
         for (const name of bundleAssetsNames) {
             const assetName = name.slice(assetsDir.length)
