@@ -56,17 +56,17 @@
     "vite": ">=3.0.0"
   },
   "dependencies": {
-    "jsdom": ">=29.0.2",
+    "jsdom": ">=29.1.1",
     "mini-svg-data-uri": ">=1.4.4",
     "mrmime": ">=2.0.1"
   },
   "devDependencies": {
     "@bddjr/types-rollupoptions-4.43.0": "4.43.0",
-    "@types/jsdom": ">=28.0.1",
-    "@types/node": "^24.12.2",
-    "rolldown": ">=1.0.0-rc.17",
-    "rolldown-plugin-dts": ">=0.23.2",
+    "@types/jsdom": ">=28.0.3",
+    "@types/node": "^24.13.2",
+    "rolldown": ">=1.1.1",
+    "rolldown-plugin-dts": ">=0.25.2",
     "typescript": ">=6.0.3",
-    "vite": ">=8.0.10"
+    "vite": ">=8.0.16"
   }
 }
