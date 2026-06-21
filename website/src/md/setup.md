@@ -4,7 +4,7 @@
 npm i -D @bddjr/vite-plugin-singlefile@latest
 ```
 
-Then modify `vite.config.ts`, like [test/vite.config.ts](test/vite.config.ts)
+Then modify `vite.config.ts`, like [website/vite.config.ts](website/vite.config.ts)
 
 ```diff
 + import singleFile from '@bddjr/vite-plugin-singlefile'
@@ -17,7 +17,7 @@ Then modify `vite.config.ts`, like [test/vite.config.ts](test/vite.config.ts)
     ],
 ```
 
-Then use hash history, like [test/src/router/index.ts](test/src/router/index.ts)
+Then use hash history, like [website/src/router/index.ts](website/src/router/index.ts)
 
 ```diff
   const router = createRouter({
