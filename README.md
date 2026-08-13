@@ -88,12 +88,12 @@ type: `boolean`
 Preview: https://bddjr.github.io/vite-plugin-singlefile/#/
 
 ```
-vite v8.0.16 building client environment for production...
-✓ 43 modules transformed.
+vite v8.2.1 building client environment for production...
+✓ 44 modules transformed.
 computing gzip size...
-dist/index.html  122.44 kB │ gzip: 43.08 kB
+dist/index.html  123.40 kB │ gzip: 43.40 kB
 
-✓ built in 337ms
+✓ built in 365ms
 ```
 
 ## Clone
