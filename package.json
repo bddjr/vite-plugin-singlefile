@@ -56,16 +56,17 @@
     "vite": ">=3.0.0"
   },
   "dependencies": {
-    "jsdom": "catalog:",
-    "mini-svg-data-uri": "catalog:",
-    "mrmime": "catalog:"
+    "jsdom": ">=30.0.1",
+    "mini-svg-data-uri": "^1.4.4",
+    "mrmime": "^2.0.1"
   },
   "devDependencies": {
-    "@bddjr/types-rollupoptions-4.43.0": "catalog:",
-    "@types/jsdom": "catalog:",
+    "@bddjr/types-rollupoptions-4.43.0": "4.43.0",
+    "@types/jsdom": ">=30.0.0",
     "@types/node": "catalog:",
-    "rolldown": "catalog:",
-    "rolldown-plugin-dts": "catalog:",
-    "typescript": "catalog:"
+    "rolldown": "^1.2.3",
+    "rolldown-plugin-dts": "^0.28.1",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }
