@@ -62,11 +62,11 @@
   },
   "devDependencies": {
     "@bddjr/types-rollupoptions-4.43.0": "4.43.0",
-    "@types/jsdom": ">=30.0.0",
+    "@types/jsdom": "^30.0.0",
     "@types/node": "catalog:",
-    "rolldown": "^1.2.3",
-    "rolldown-plugin-dts": "^0.28.1",
+    "rolldown": "^1.2.7",
+    "rolldown-plugin-dts": "^0.28.5",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "^8.2.2"
   }
 }
