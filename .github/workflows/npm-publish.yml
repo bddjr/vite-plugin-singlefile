@@ -2,7 +2,7 @@ name: Node.js Package
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 permissions:
   id-token: write # Required for OIDC
@@ -23,8 +23,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 10
+          version: "11"
 
       - run: pnpm i
 
-      - run: npm publish
+      - run: pnpm publish --no-git-checks
