@@ -1,6 +1,6 @@
 packages:
   - website
 catalog:
-  "@types/node": "^24.13.2"
+  "@types/node": "^24.13.3"
   typescript: "^6.0.3"
-  vite: "^8.2.1"
+  vite: "^8.2.2"
