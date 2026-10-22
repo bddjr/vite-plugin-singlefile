@@ -23,7 +23,7 @@
     "markdown-it": "^15.0.3",
     "markdown-it-highlightjs": "^4.3.0",
     "npm-run-all2": "^9.0.3",
-    "oxfmt": "^0.66.0",
+    "oxfmt": "^0.74.0",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plugin-vue-devtools": "^8.2.1",
